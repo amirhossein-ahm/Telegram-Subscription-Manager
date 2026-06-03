@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+*.session
+sessions/
+database/*.db
+database/*.sqlite
+env/
+.venv/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.vscode/
+.idea/

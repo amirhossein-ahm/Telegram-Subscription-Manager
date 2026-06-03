@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}
+System Logs - Telegram Subscription Manager
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="mb-1">System Logs</h2>
+
+        <p class="text-muted mb-0">
+            Application events, Telegram errors, refresh history and diagnostics.
+        </p>
+    </div>
+
+    <div>
+
+        <form
+            method="POST"
+            action="/logs/clear"
+        >
+
+            <button
+                type="submit"
+                class="btn btn-danger"
+                data-confirm="Clear all logs?"
+            >
+                Clear Logs
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <span>Recent Logs</span>
+
+        <input
+            id="tableSearch"
+            class="form-control"
+            style="max-width:250px"
+            placeholder="Search logs..."
+        >
+
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if logs %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover mb-0">
+
+                <thead>
+
+                <tr>
+                    <th width="120">Level</th>
+                    <th>Message</th>
+                    <th width="220">Created</th>
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for log in logs %}
+
+                <tr data-filter-row>
+
+                    <td>
+
+                        {% if log.level == "INFO" %}
+
+                            <span class="badge bg-primary">
+                                INFO
+                            </span>
+
+                        {% elif log.level == "WARNING" %}
+
+                            <span class="badge bg-warning text-dark">
+                                WARNING
+                            </span>
+
+                        {% elif log.level == "ERROR" %}
+
+                            <span class="badge bg-danger">
+                                ERROR
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                {{ log.level }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <code>
+                            {{ log.message }}
+                        </code>
+
+                    </td>
+
+                    <td>
+
+                        {{ log.created_at }}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="p-4 text-muted">
+
+            No logs available.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

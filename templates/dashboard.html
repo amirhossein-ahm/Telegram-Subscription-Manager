@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Telegram Subscription Manager
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="mb-1">Dashboard</h2>
+        <p class="text-muted mb-0">
+            Overview of channels, subscriptions, and extracted configurations.
+        </p>
+    </div>
+
+    <div>
+        <a
+            href="/subscriptions"
+            class="btn btn-primary btn-icon"
+        >
+            <i class="bi bi-link-45deg"></i>
+            Subscriptions
+        </a>
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+
+        <div class="card stat-card h-100">
+            <div class="card-body">
+
+                <div class="stat-value">
+                    {{ total_channels }}
+                </div>
+
+                <div class="stat-label">
+                    Channels
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card stat-card h-100">
+            <div class="card-body">
+
+                <div class="stat-value">
+                    {{ total_subscriptions }}
+                </div>
+
+                <div class="stat-label">
+                    Subscriptions
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card stat-card h-100">
+            <div class="card-body">
+
+                <div class="stat-value">
+                    {{ enabled_channels }}
+                </div>
+
+                <div class="stat-label">
+                    Enabled Channels
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="card">
+
+            <div class="card-header">
+                Recent Subscriptions
+            </div>
+
+            <div class="card-body p-0">
+
+                {% if subscriptions %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Channels</th>
+                            <th>Token</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for sub in subscriptions %}
+
+                        <tr>
+
+                            <td>
+                                {{ sub.name }}
+                            </td>
+
+                            <td>
+                                {{ sub.channels|length }}
+                            </td>
+
+                            <td>
+                                <code>
+                                    {{ sub.token[:12] }}...
+                                </code>
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="p-4 text-muted">
+                    No subscriptions created yet.
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card mb-4">
+
+            <div class="card-header">
+                Quick Actions
+            </div>
+
+            <div class="card-body">
+
+                <div class="d-grid gap-2">
+
+                    <a
+                        href="/channels"
+                        class="btn btn-outline-primary"
+                    >
+                        Manage Channels
+                    </a>
+
+                    <a
+                        href="/subscriptions"
+                        class="btn btn-outline-success"
+                    >
+                        Manage Subscriptions
+                    </a>
+
+                    <a
+                        href="/logs"
+                        class="btn btn-outline-secondary"
+                    >
+                        View Logs
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">
+                System Status
+            </div>
+
+            <div class="card-body">
+
+                <div class="mb-2">
+                    <strong>Telegram:</strong>
+
+                    {% if telegram_connected %}
+                        <span class="badge bg-success">
+                            Connected
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger">
+                            Offline
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-2">
+                    <strong>Database:</strong>
+
+                    <span class="badge bg-success">
+                        Connected
+                    </span>
+                </div>
+
+                <div class="mb-2">
+                    <strong>Session:</strong>
+
+                    <span class="badge bg-success">
+                        Active
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
