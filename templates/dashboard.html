@@ -6,93 +6,157 @@ Dashboard - Telegram Subscription Manager
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="dashboard-header mb-4">
 
     <div>
-        <h2 class="mb-1">Dashboard</h2>
+
+        <h2 class="fw-bold mb-1">
+            Dashboard
+        </h2>
+
         <p class="text-muted mb-0">
-            Overview of channels, subscriptions, and extracted configurations.
+            Overview of your Telegram channels, subscriptions and system status.
         </p>
+
     </div>
 
     <div>
+
         <a
             href="/subscriptions"
-            class="btn btn-primary btn-icon"
+            class="btn btn-primary"
         >
-            <i class="bi bi-link-45deg"></i>
-            Subscriptions
+            <i class="bi bi-plus-circle me-1"></i>
+            New Subscription
         </a>
+
     </div>
 
 </div>
+
+<!-- Stats -->
 
 <div class="row g-4 mb-4">
 
-    <div class="col-md-4">
+    <div class="col-xl-4 col-md-6">
 
         <div class="card stat-card h-100">
+
             <div class="card-body">
 
-                <div class="stat-value">
-                    {{ total_channels }}
-                </div>
+                <div class="d-flex justify-content-between align-items-center">
 
-                <div class="stat-label">
-                    Channels
+                    <div>
+
+                        <div class="stat-label">
+                            Total Channels
+                        </div>
+
+                        <div class="stat-value">
+                            {{ total_channels }}
+                        </div>
+
+                    </div>
+
+                    <div class="dashboard-icon bg-primary-subtle">
+                        <i class="bi bi-broadcast"></i>
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
 
     </div>
 
-    <div class="col-md-4">
+    <div class="col-xl-4 col-md-6">
 
         <div class="card stat-card h-100">
+
             <div class="card-body">
 
-                <div class="stat-value">
-                    {{ total_subscriptions }}
-                </div>
+                <div class="d-flex justify-content-between align-items-center">
 
-                <div class="stat-label">
-                    Subscriptions
+                    <div>
+
+                        <div class="stat-label">
+                            Subscriptions
+                        </div>
+
+                        <div class="stat-value">
+                            {{ total_subscriptions }}
+                        </div>
+
+                    </div>
+
+                    <div class="dashboard-icon bg-success-subtle">
+                        <i class="bi bi-link-45deg"></i>
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
 
     </div>
 
-    <div class="col-md-4">
+    <div class="col-xl-4 col-md-12">
 
         <div class="card stat-card h-100">
+
             <div class="card-body">
 
-                <div class="stat-value">
-                    {{ enabled_channels }}
-                </div>
+                <div class="d-flex justify-content-between align-items-center">
 
-                <div class="stat-label">
-                    Enabled Channels
+                    <div>
+
+                        <div class="stat-label">
+                            Enabled Channels
+                        </div>
+
+                        <div class="stat-value">
+                            {{ enabled_channels }}
+                        </div>
+
+                    </div>
+
+                    <div class="dashboard-icon bg-warning-subtle">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
                 </div>
 
             </div>
+
         </div>
 
     </div>
 
 </div>
 
+<!-- Main Content -->
+
 <div class="row g-4">
 
-    <div class="col-lg-8">
+    <div class="col-xl-8">
 
-        <div class="card">
+        <div class="card h-100">
 
-            <div class="card-header">
-                Recent Subscriptions
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <span>
+                    Recent Subscriptions
+                </span>
+
+                <a
+                    href="/subscriptions"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                    View All
+                </a>
+
             </div>
 
             <div class="card-body p-0">
@@ -101,14 +165,16 @@ Dashboard - Telegram Subscription Manager
 
                 <div class="table-responsive">
 
-                    <table class="table table-hover mb-0">
+                    <table class="table table-hover align-middle mb-0">
 
                         <thead>
+
                         <tr>
                             <th>Name</th>
                             <th>Channels</th>
                             <th>Token</th>
                         </tr>
+
                         </thead>
 
                         <tbody>
@@ -118,17 +184,27 @@ Dashboard - Telegram Subscription Manager
                         <tr>
 
                             <td>
-                                {{ sub.name }}
+
+                                <strong>
+                                    {{ sub.name }}
+                                </strong>
+
                             </td>
 
                             <td>
-                                {{ sub.channels|length }}
+
+                                <span class="badge bg-primary">
+                                    {{ sub.channels|length }}
+                                </span>
+
                             </td>
 
                             <td>
+
                                 <code>
-                                    {{ sub.token[:12] }}...
+                                    {{ sub.token[:18] }}...
                                 </code>
+
                             </td>
 
                         </tr>
@@ -143,8 +219,12 @@ Dashboard - Telegram Subscription Manager
 
                 {% else %}
 
-                <div class="p-4 text-muted">
+                <div class="p-5 text-center text-muted">
+
+                    <i class="bi bi-link-45deg fs-1 d-block mb-3"></i>
+
                     No subscriptions created yet.
+
                 </div>
 
                 {% endif %}
@@ -155,7 +235,9 @@ Dashboard - Telegram Subscription Manager
 
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-xl-4">
+
+        <!-- Quick Actions -->
 
         <div class="card mb-4">
 
@@ -165,12 +247,13 @@ Dashboard - Telegram Subscription Manager
 
             <div class="card-body">
 
-                <div class="d-grid gap-2">
+                <div class="d-grid gap-3">
 
                     <a
                         href="/channels"
                         class="btn btn-outline-primary"
                     >
+                        <i class="bi bi-broadcast me-2"></i>
                         Manage Channels
                     </a>
 
@@ -178,6 +261,7 @@ Dashboard - Telegram Subscription Manager
                         href="/subscriptions"
                         class="btn btn-outline-success"
                     >
+                        <i class="bi bi-link-45deg me-2"></i>
                         Manage Subscriptions
                     </a>
 
@@ -185,6 +269,7 @@ Dashboard - Telegram Subscription Manager
                         href="/logs"
                         class="btn btn-outline-secondary"
                     >
+                        <i class="bi bi-journal-text me-2"></i>
                         View Logs
                     </a>
 
@@ -194,6 +279,8 @@ Dashboard - Telegram Subscription Manager
 
         </div>
 
+        <!-- System Status -->
+
         <div class="card">
 
             <div class="card-header">
@@ -202,34 +289,54 @@ Dashboard - Telegram Subscription Manager
 
             <div class="card-body">
 
-                <div class="mb-2">
-                    <strong>Telegram:</strong>
+                <div class="status-item">
+
+                    <span>
+                        Telegram
+                    </span>
 
                     {% if telegram_connected %}
-                        <span class="badge bg-success">
-                            Connected
-                        </span>
-                    {% else %}
-                        <span class="badge bg-danger">
-                            Offline
-                        </span>
-                    {% endif %}
-                </div>
-
-                <div class="mb-2">
-                    <strong>Database:</strong>
 
                     <span class="badge bg-success">
                         Connected
                     </span>
+
+                    {% else %}
+
+                    <span class="badge bg-danger">
+                        Offline
+                    </span>
+
+                    {% endif %}
+
                 </div>
 
-                <div class="mb-2">
-                    <strong>Session:</strong>
+                <hr>
+
+                <div class="status-item">
+
+                    <span>
+                        Database
+                    </span>
+
+                    <span class="badge bg-success">
+                        Connected
+                    </span>
+
+                </div>
+
+                <hr>
+
+                <div class="status-item">
+
+                    <span>
+                        Session
+                    </span>
 
                     <span class="badge bg-success">
                         Active
                     </span>
+
                 </div>
 
             </div>

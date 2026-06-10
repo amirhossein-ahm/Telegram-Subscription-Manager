@@ -1,12 +1,113 @@
 "use strict";
 
 /* ==========================================
-   Toast / Notifications
+   Toast System
 ========================================== */
 
-function showMessage(message) {
-    console.log(message);
+function showToast(message, type = "success") {
+
+    let container =
+        document.getElementById(
+            "toastContainer"
+        );
+
+    if (!container) {
+
+        container =
+            document.createElement("div");
+
+        container.id =
+            "toastContainer";
+
+        container.style.position =
+            "fixed";
+
+        container.style.top =
+            "20px";
+
+        container.style.right =
+            "20px";
+
+        container.style.zIndex =
+            "9999";
+
+        document.body.appendChild(
+            container
+        );
+    }
+
+    const toast =
+        document.createElement("div");
+
+    toast.className =
+        `alert alert-${type}`;
+
+    toast.style.minWidth =
+        "250px";
+
+    toast.style.marginBottom =
+        "10px";
+
+    toast.style.boxShadow =
+        "0 10px 30px rgba(0,0,0,.1)";
+
+    toast.innerHTML = message;
+
+    container.appendChild(
+        toast
+    );
+
+    setTimeout(() => {
+
+        toast.style.opacity = "0";
+
+        toast.style.transition =
+            "0.3s";
+
+        setTimeout(
+            () => toast.remove(),
+            300
+        );
+
+    }, 2500);
 }
+
+/* ==========================================
+   Sidebar Toggle
+========================================== */
+
+function initializeSidebar() {
+
+    const toggle =
+        document.getElementById(
+            "sidebarToggle"
+        );
+
+    const sidebar =
+        document.getElementById(
+            "sidebar"
+        );
+
+    if (
+        !toggle ||
+        !sidebar
+    ) {
+        return;
+    }
+
+    toggle.addEventListener(
+        "click",
+        () => {
+
+            sidebar.classList.toggle(
+                "show"
+            );
+
+        }
+    );
+}
+
+initializeSidebar();
 
 /* ==========================================
    Copy To Clipboard
@@ -16,23 +117,24 @@ async function copyToClipboard(text) {
 
     try {
 
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(
+            text
+        );
 
-        showMessage("Copied");
+        showToast(
+            "Copied to clipboard"
+        );
 
     } catch (error) {
 
-        console.error(
-            "Clipboard error:",
-            error
-        );
+        console.error(error);
 
+        showToast(
+            "Copy failed",
+            "danger"
+        );
     }
 }
-
-/* ==========================================
-   Copy Button Support
-========================================== */
 
 document.addEventListener(
     "click",
@@ -56,12 +158,14 @@ document.addEventListener(
             return;
         }
 
-        copyToClipboard(value);
+        copyToClipboard(
+            value
+        );
     }
 );
 
 /* ==========================================
-   Confirm Actions
+   Confirm Dialog
 ========================================== */
 
 document.addEventListener(
@@ -80,47 +184,18 @@ document.addEventListener(
         const message =
             button.getAttribute(
                 "data-confirm"
-            ) || "Are you sure?";
+            ) ||
+            "Are you sure?";
 
-        const confirmed =
-            window.confirm(message);
-
-        if (!confirmed) {
+        if (
+            !window.confirm(
+                message
+            )
+        ) {
             event.preventDefault();
         }
     }
 );
-
-/* ==========================================
-   Auto Refresh Tables
-========================================== */
-
-function autoRefresh() {
-
-    const interval =
-        document.body.dataset.refresh;
-
-    if (!interval) {
-        return;
-    }
-
-    const seconds =
-        parseInt(interval);
-
-    if (
-        Number.isNaN(seconds) ||
-        seconds <= 0
-    ) {
-        return;
-    }
-
-    setTimeout(
-        () => window.location.reload(),
-        seconds * 1000
-    );
-}
-
-autoRefresh();
 
 /* ==========================================
    Search Filter
@@ -142,24 +217,27 @@ function initializeFilters() {
         function () {
 
             const value =
-                this.value.toLowerCase();
+                this.value
+                    .toLowerCase()
+                    .trim();
 
-            const rows =
-                document.querySelectorAll(
+            document
+                .querySelectorAll(
                     "[data-filter-row]"
-                );
+                )
+                .forEach(row => {
 
-            rows.forEach(row => {
+                    const text =
+                        row.innerText
+                            .toLowerCase();
 
-                const text =
-                    row.innerText.toLowerCase();
-
-                row.style.display =
-                    text.includes(value)
-                        ? ""
-                        : "none";
-
-            });
+                    row.style.display =
+                        text.includes(
+                            value
+                        )
+                            ? ""
+                            : "none";
+                });
         }
     );
 }
@@ -167,12 +245,17 @@ function initializeFilters() {
 initializeFilters();
 
 /* ==========================================
-   AJAX Refresh Button
+   Subscription Refresh
 ========================================== */
 
 async function refreshSubscription(id) {
 
     try {
+
+        showToast(
+            "Refreshing subscription...",
+            "primary"
+        );
 
         const response =
             await fetch(
@@ -183,22 +266,65 @@ async function refreshSubscription(id) {
             );
 
         if (!response.ok) {
+
             throw new Error(
                 "Refresh failed"
             );
         }
 
-        window.location.reload();
+        showToast(
+            "Refresh completed"
+        );
+
+        setTimeout(
+            () =>
+                window.location.reload(),
+            800
+        );
 
     } catch (error) {
 
-        alert(
-            "Failed to refresh subscription."
-        );
-
         console.error(error);
+
+        showToast(
+            "Refresh failed",
+            "danger"
+        );
     }
 }
+
+/* ==========================================
+   Auto Refresh
+========================================== */
+
+function autoRefresh() {
+
+    const interval =
+        document.body.dataset
+            .refresh;
+
+    if (!interval) {
+        return;
+    }
+
+    const seconds =
+        parseInt(interval);
+
+    if (
+        Number.isNaN(seconds) ||
+        seconds <= 0
+    ) {
+        return;
+    }
+
+    setTimeout(
+        () =>
+            window.location.reload(),
+        seconds * 1000
+    );
+}
+
+autoRefresh();
 
 /* ==========================================
    Loading Buttons
@@ -208,9 +334,15 @@ document.addEventListener(
     "submit",
     function (event) {
 
-        const form = event.target;
+        const form =
+            event.target;
 
-        if (!(form instanceof HTMLFormElement)) {
+        if (
+            !(
+                form instanceof
+                HTMLFormElement
+            )
+        ) {
             return;
         }
 
@@ -223,20 +355,140 @@ document.addEventListener(
             return;
         }
 
-        button.disabled = true;
-
         const original =
             button.innerHTML;
 
+        button.disabled = true;
+
         button.innerHTML =
-            "Please wait...";
+            `
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+        `;
 
         setTimeout(
             () => {
-                button.disabled = false;
-                button.innerHTML = original;
+
+                button.disabled =
+                    false;
+
+                button.innerHTML =
+                    original;
+
             },
             10000
         );
     }
 );
+
+/* ==========================================
+   Active Menu Highlight
+========================================== */
+
+function initializeActiveMenu() {
+
+    const current =
+        window.location.pathname;
+
+    document
+        .querySelectorAll(
+            ".sidebar-link"
+        )
+        .forEach(link => {
+
+            const href =
+                link.getAttribute(
+                    "href"
+                );
+
+            if (
+                href &&
+                current.startsWith(
+                    href
+                )
+            ) {
+
+                link.style.background =
+                    "var(--sidebar-active)";
+
+                link.style.color =
+                    "#fff";
+            }
+        });
+}
+
+
+/* ==========================================
+   Subscription Edit Modal
+========================================== */
+
+function openEditModal(data) {
+
+    const modal =
+        document.getElementById(
+            "editSubscriptionModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    document.getElementById(
+        "editSubscriptionId"
+    ).value = data.id;
+
+    document.getElementById(
+        "editSubscriptionName"
+    ).value = data.name || "";
+
+    document.getElementById(
+        "editRemarkName"
+    ).value = data.remark || "";
+
+    document.getElementById(
+        "editMessageLimit"
+    ).value = data.limit || 300;
+
+    document.getElementById(
+        "editEncoding"
+    ).value =
+        data.base64
+            ? "1"
+            : "0";
+
+    const channelSelect =
+        document.getElementById(
+            "editChannels"
+        );
+
+    if (channelSelect) {
+
+        Array.from(
+            channelSelect.options
+        ).forEach(option => {
+
+            option.selected =
+                data.channels.indexOf(
+                    parseInt(option.value)
+                ) !== -1
+
+        });
+    }
+
+    const form =
+        document.getElementById(
+            "editSubscriptionForm"
+        );
+
+    form.action =
+        `/subscriptions/${data.id}/edit`;
+
+    const bootstrapModal =
+        new bootstrap.Modal(
+            modal
+        );
+
+    bootstrapModal.show();
+}
+
+initializeActiveMenu();

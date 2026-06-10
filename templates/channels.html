@@ -6,214 +6,311 @@ Channels - Telegram Subscription Manager
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="dashboard-header mb-4">
 
-    <div>
-        <h2 class="mb-1">Channels</h2>
 
-        <p class="text-muted mb-0">
-            Manage Telegram channels used as sources for subscriptions.
-        </p>
-    </div>
+<div>
+
+    <h2 class="fw-bold mb-1">
+        Channels
+    </h2>
+
+    <p class="text-muted mb-0">
+        Manage Telegram channels used as sources for subscriptions.
+    </p>
 
 </div>
+
+<div>
+
+    <span class="badge bg-primary fs-6">
+        {{ channels|length }} Channels
+    </span>
+
+</div>
+
+
+</div>
+
+<!-- Add Channel -->
 
 <div class="card mb-4">
 
-    <div class="card-header">
-        Add Channel
-    </div>
 
-    <div class="card-body">
+<div class="card-header">
 
-        <form method="POST" action="/channels/add">
-
-            <div class="row g-3">
-
-                <div class="col-md-10">
-
-                    <label class="form-label">
-                        Channel Username / Link
-                    </label>
-
-                    <input
-                        type="text"
-                        name="channel_name"
-                        class="form-control"
-                        placeholder="@channelname"
-                        required
-                    >
-
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary w-100"
-                    >
-                        Add Channel
-                    </button>
-
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
+    <i class="bi bi-plus-circle me-2"></i>
+    Add New Channel
 
 </div>
 
+<div class="card-body">
+
+    <form method="POST" action="/channels/add">
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-lg-10">
+
+                <label class="form-label">
+                    Telegram Channel Username / Link
+                </label>
+
+                <input
+                    type="text"
+                    name="channel_name"
+                    class="form-control"
+                    placeholder="@channelname or https://t.me/channel"
+                    required
+                >
+
+            </div>
+
+            <div class="col-lg-2">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary w-100"
+                >
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Add
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+</div>
+
+<!-- Channels Table -->
+
 <div class="card">
 
-    <div class="card-header d-flex justify-content-between align-items-center">
 
-        <span>Configured Channels</span>
+<div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-        <input
-            id="tableSearch"
-            class="form-control"
-            style="max-width:250px"
-            placeholder="Search..."
-        >
+    <span>
 
-    </div>
+        <i class="bi bi-broadcast me-2"></i>
+        Configured Channels
 
-    <div class="card-body p-0">
+    </span>
 
-        {% if channels %}
+    <input
+        id="tableSearch"
+        class="form-control"
+        style="max-width:280px"
+        placeholder="Search channels..."
+    >
 
-        <div class="table-responsive">
+</div>
 
-            <table class="table table-hover mb-0">
+<div class="card-body p-0">
 
-                <thead>
+    {% if channels %}
 
-                <tr>
-                    <th>ID</th>
-                    <th>Channel</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th width="220">Actions</th>
-                </tr>
+    <div class="table-responsive">
 
-                </thead>
+        <table class="table table-hover align-middle mb-0">
 
-                <tbody>
+            <thead>
 
-                {% for channel in channels %}
+            <tr>
 
-                <tr data-filter-row>
+                <th width="80">
+                    ID
+                </th>
 
-                    <td>
-                        {{ channel.id }}
-                    </td>
+                <th>
+                    Channel
+                </th>
 
-                    <td>
-                        <strong>
-                            {{ channel.name }}
-                        </strong>
-                    </td>
+                <th width="140">
+                    Status
+                </th>
 
-                    <td>
+                <th width="220">
+                    Created
+                </th>
 
-                        {% if channel.enabled %}
+                <th width="260">
+                    Actions
+                </th>
 
-                        <span class="badge bg-success">
-                            Enabled
-                        </span>
+            </tr>
 
-                        {% else %}
+            </thead>
 
-                        <span class="badge bg-danger">
-                            Disabled
-                        </span>
+            <tbody>
 
-                        {% endif %}
+            {% for channel in channels %}
 
-                    </td>
+            <tr data-filter-row>
 
-                    <td>
-                        {{ channel.created_at }}
-                    </td>
+                <td>
 
-                    <td>
+                    <span class="badge bg-secondary">
 
-                        <div class="d-flex gap-2">
+                        #{{ channel.id }}
 
-                            {% if channel.enabled %}
+                    </span>
 
-                            <form
-                                method="POST"
-                                action="/channels/{{ channel.id }}/disable"
-                            >
+                </td>
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-sm btn-warning"
-                                >
-                                    Disable
-                                </button>
+                <td>
 
-                            </form>
+                    <div class="d-flex align-items-center gap-3">
 
-                            {% else %}
+                        <div class="dashboard-icon bg-primary-subtle">
 
-                            <form
-                                method="POST"
-                                action="/channels/{{ channel.id }}/enable"
-                            >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-sm btn-success"
-                                >
-                                    Enable
-                                </button>
-
-                            </form>
-
-                            {% endif %}
-
-                            <form
-                                method="POST"
-                                action="/channels/{{ channel.id }}/delete"
-                            >
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-sm btn-danger"
-                                    data-confirm="Delete this channel?"
-                                >
-                                    Delete
-                                </button>
-
-                            </form>
+                            <i class="bi bi-telegram"></i>
 
                         </div>
 
-                    </td>
+                        <div>
 
-                </tr>
+                            <strong>
 
-                {% endfor %}
+                                {{ channel.name }}
 
-                </tbody>
+                            </strong>
 
-            </table>
+                        </div>
 
-        </div>
+                    </div>
 
-        {% else %}
+                </td>
 
-        <div class="p-4 text-muted">
-            No channels configured.
-        </div>
+                <td>
 
-        {% endif %}
+                    {% if channel.enabled %}
+
+                    <span class="badge bg-success">
+
+                        Enabled
+
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge bg-danger">
+
+                        Disabled
+
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <small class="text-muted">
+
+                        {{ channel.created_at }}
+
+                    </small>
+
+                </td>
+
+                <td>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        {% if channel.enabled %}
+
+                        <form
+                            method="POST"
+                            action="/channels/{{ channel.id }}/disable"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-warning"
+                            >
+                                <i class="bi bi-pause-circle me-1"></i>
+                                Disable
+                            </button>
+
+                        </form>
+
+                        {% else %}
+
+                        <form
+                            method="POST"
+                            action="/channels/{{ channel.id }}/enable"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-success"
+                            >
+                                <i class="bi bi-play-circle me-1"></i>
+                                Enable
+                            </button>
+
+                        </form>
+
+                        {% endif %}
+
+                        <form
+                            method="POST"
+                            action="/channels/{{ channel.id }}/delete"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-danger"
+                                data-confirm="Delete this channel?"
+                            >
+                                <i class="bi bi-trash me-1"></i>
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
 
     </div>
+
+    {% else %}
+
+    <div class="text-center p-5">
+
+        <i
+            class="bi bi-broadcast text-muted"
+            style="font-size:4rem;"
+        ></i>
+
+        <h5 class="mt-3">
+            No Channels Found
+        </h5>
+
+        <p class="text-muted mb-0">
+            Add your first Telegram channel to start building subscriptions.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
 
 </div>
 

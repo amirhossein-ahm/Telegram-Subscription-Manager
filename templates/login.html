@@ -4,80 +4,129 @@
 Login - Telegram Subscription Manager
 {% endblock %}
 
-{% block content %}
+{% block login_content %}
 
-<div class="login-wrapper">
+<div class="login-page">
 
-    <div class="card login-card shadow-sm">
+    <div class="login-background"></div>
 
-        <div class="card-body p-4">
+    <div class="login-container">
 
-            <div class="text-center mb-4">
+        <div class="login-brand">
 
-                <h2 class="fw-bold">
-                    Telegram Subscription Manager
-                </h2>
+            <div class="login-logo">
+                <i class="bi bi-telegram"></i>
+            </div>
 
-                <p class="text-muted mb-0">
-                    Administrator Login
-                </p>
+            <h1>
+                Telegram Subscription Manager
+            </h1>
+
+            <p>
+                Professional Telegram Config Aggregator
+            </p>
+
+        </div>
+
+        <div class="card login-card">
+
+            <div class="card-body">
+
+                <div class="text-center mb-4">
+
+                    <h3 class="fw-bold mb-2">
+                        Welcome Back
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Sign in to access your dashboard
+                    </p>
+
+                </div>
+
+                <form method="POST">
+
+                    <div class="mb-3">
+
+                        <label
+                            class="form-label"
+                            for="username"
+                        >
+                            Username
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-person"></i>
+                            </span>
+
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                class="form-control"
+                                required
+                                autocomplete="username"
+                                placeholder="Enter username"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label
+                            class="form-label"
+                            for="password"
+                        >
+                            Password
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-shield-lock"></i>
+                            </span>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control"
+                                required
+                                autocomplete="current-password"
+                                placeholder="Enter password"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-grid">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-lg"
+                        >
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Sign In
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
 
-            <form method="POST">
+        </div>
 
-                <div class="mb-3">
+        <div class="login-footer">
 
-                    <label
-                        class="form-label"
-                        for="username"
-                    >
-                        Username
-                    </label>
-
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        class="form-control"
-                        required
-                        autocomplete="username"
-                    >
-
-                </div>
-
-                <div class="mb-4">
-
-                    <label
-                        class="form-label"
-                        for="password"
-                    >
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="form-control"
-                        required
-                        autocomplete="current-password"
-                    >
-
-                </div>
-
-                <div class="d-grid">
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
-                        Sign In
-                    </button>
-
-                </div>
-
-            </form>
+            <span>
+                Flask • Telethon • SQLite
+            </span>
 
         </div>
 
