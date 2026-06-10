@@ -8,262 +8,471 @@ Subscriptions - Telegram Subscription Manager
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
+    <div>
+        <h2 class="mb-1">Subscriptions</h2>
 
-<div>
-    <h2 class="mb-1">Subscriptions</h2>
-    <p class="text-muted mb-0">
-        Create and manage V2Ray subscription feeds.
-    </p>
-</div>
-
+        <p class="text-muted mb-0">
+            Create and manage V2Ray subscription feeds.
+        </p>
+    </div>
 
 </div>
 
 <div class="card mb-4">
 
+    <div class="card-header">
+        Create Subscription
+    </div>
 
-<div class="card-header">
-    Create Subscription
-</div>
+    <div class="card-body">
 
-<div class="card-body">
+        <form method="POST" action="/subscriptions/create">
 
-    <form method="POST" action="/subscriptions/create">
+            <div class="row g-3">
 
-        <div class="row g-3">
+                <div class="col-md-2">
 
-            <div class="col-md-3">
+                    <label class="form-label">
+                        Subscription Name
+                    </label>
 
-                <label class="form-label">
-                    Subscription Name
-                </label>
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        required
+                        placeholder="Main Subscription"
+                    >
 
-                <input
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    required
-                    placeholder="Main Subscription"
-                >
+                </div>
+
+                <div class="col-md-2">
+
+                    <label class="form-label">
+                        Remark Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="remark_name"
+                        class="form-control"
+                        placeholder="MyVPN"
+                    >
+
+                    <small class="text-muted">
+                        Custom node name
+                    </small>
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <label class="form-label">
+                        Message Limit
+                    </label>
+
+                    <input
+                        type="number"
+                        name="message_limit"
+                        class="form-control"
+                        min="1"
+                        max="5000"
+                        value="300"
+                        required
+                    >
+
+                    <small class="text-muted">
+                        Per channel
+                    </small>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+                        Channels
+                    </label>
+
+                    <select
+                        name="channel_ids"
+                        class="form-select"
+                        multiple
+                        required
+                        size="6"
+                    >
+
+                        {% for channel in channels %}
+                        <option value="{{ channel.id }}">
+                            {{ channel.name }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+
+                    <small class="text-muted">
+                        Hold Ctrl/Cmd to select multiple channels.
+                    </small>
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <label class="form-label">
+                        Encoding
+                    </label>
+
+                    <select
+                        name="base64_enabled"
+                        class="form-select"
+                    >
+                        <option value="1">
+                            Base64
+                        </option>
+
+                        <option value="0">
+                            Plain Text
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+                        Create
+                    </button>
+
+                </div>
 
             </div>
 
-            <div class="col-md-3">
+        </form>
 
-                <label class="form-label">
-                    Remark Name
-                </label>
-
-                <input
-                    type="text"
-                    name="remark_name"
-                    class="form-control"
-                    placeholder="MyVPN"
-                >
-
-                <small class="text-muted">
-                    Custom node name shown in V2Ray clients
-                </small>
-
-            </div>
-
-            <div class="col-md-3">
-
-                <label class="form-label">
-                    Channels
-                </label>
-
-                <select
-                    name="channel_ids"
-                    class="form-select"
-                    multiple
-                    required
-                    size="6"
-                >
-
-                    {% for channel in channels %}
-                    <option value="{{ channel.id }}">
-                        {{ channel.name }}
-                    </option>
-                    {% endfor %}
-
-                </select>
-
-                <small class="text-muted">
-                    Hold Ctrl/Cmd to select multiple channels.
-                </small>
-
-            </div>
-
-            <div class="col-md-2">
-
-                <label class="form-label">
-                    Encoding
-                </label>
-
-                <select
-                    name="base64_enabled"
-                    class="form-select"
-                >
-                    <option value="1">
-                        Base64
-                    </option>
-
-                    <option value="0">
-                        Plain Text
-                    </option>
-                </select>
-
-            </div>
-
-            <div class="col-md-1 d-flex align-items-end">
-
-                <button
-                    type="submit"
-                    class="btn btn-primary w-100"
-                >
-                    Create
-                </button>
-
-            </div>
-
-        </div>
-
-    </form>
-
-</div>
+    </div>
 
 </div>
 
 <div class="card">
 
+    <div class="card-header d-flex justify-content-between align-items-center">
 
-<div class="card-header d-flex justify-content-between align-items-center">
+        <span>Subscriptions</span>
 
-    <span>Subscriptions</span>
+        <input
+            id="tableSearch"
+            class="form-control"
+            style="max-width:250px"
+            placeholder="Search..."
+        >
 
-    <input
-        id="tableSearch"
-        class="form-control"
-        style="max-width:250px"
-        placeholder="Search..."
-    >
+    </div>
 
-</div>
+    <div class="card-body p-0">
 
-<div class="card-body p-0">
+        {% if subscriptions %}
 
-    {% if subscriptions %}
+        <div class="table-responsive">
 
-    <div class="table-responsive">
+            <table class="table table-hover mb-0">
 
-        <table class="table table-hover mb-0">
+                <thead>
 
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Remark</th>
-                <th>Channels</th>
-                <th>Subscription URL</th>
-                <th width="260">Actions</th>
-            </tr>
-            </thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Remark</th>
+                    <th>Limit</th>
+                    <th>Channels</th>
+                    <th>Subscription URL</th>
+                    <th width="320">Actions</th>
+                </tr>
 
-            <tbody>
+                </thead>
 
-            {% for sub in subscriptions %}
+                <tbody>
 
-            <tr data-filter-row>
+                {% for sub in subscriptions %}
 
-                <td>
-                    <strong>
-                        {{ sub.name }}
-                    </strong>
-                </td>
+                <tr data-filter-row>
 
-                <td>
+                    <td>
+                        <strong>
+                            {{ sub.name }}
+                        </strong>
+                    </td>
 
-                    {% if sub.remark_name %}
-                        {{ sub.remark_name }}
-                    {% else %}
-                        -
-                    {% endif %}
+                    <td>
 
-                </td>
+                        {% if sub.remark_name %}
+                            {{ sub.remark_name }}
+                        {% else %}
+                            -
+                        {% endif %}
 
-                <td>
-                    {{ sub.channels|length }}
-                </td>
+                    </td>
 
-                <td>
+                    <td>
+                        {{ sub.message_limit }}
+                    </td>
 
-                    <div class="subscription-box">
+                    <td>
+                        {{ sub.channels|length }}
+                    </td>
 
-                        {{ request.host_url }}sub/{{ sub.token }}
+                    <td>
 
-                    </div>
+                        <div class="subscription-box">
 
-                </td>
+                            {{ request.host_url }}sub/{{ sub.token }}
 
-                <td>
+                        </div>
 
-                    <div class="d-flex flex-wrap gap-2">
+                    </td>
 
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-primary"
-                            data-copy="{{ request.host_url }}sub/{{ sub.token }}"
-                        >
-                            Copy
-                        </button>
+                    <td>
 
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-success"
-                            onclick="refreshSubscription({{ sub.id }})"
-                        >
-                            Refresh
-                        </button>
-
-                        <form
-                            method="POST"
-                            action="/subscriptions/{{ sub.id }}/delete"
-                        >
+                        <div class="d-flex flex-wrap gap-2">
 
                             <button
-                                type="submit"
-                                class="btn btn-sm btn-danger"
-                                data-confirm="Delete this subscription?"
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                data-copy="{{ request.host_url }}sub/{{ sub.token }}"
                             >
-                                Delete
+                                Copy
                             </button>
 
-                        </form>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal{{ sub.id }}"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-success"
+                                onclick="refreshSubscription({{ sub.id }})"
+                            >
+                                Refresh
+                            </button>
+
+                            <form
+                                method="POST"
+                                action="/subscriptions/{{ sub.id }}/delete"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    data-confirm="Delete this subscription?"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                <!-- Edit Modal -->
+
+                <div
+                    class="modal fade"
+                    id="editModal{{ sub.id }}"
+                    tabindex="-1"
+                >
+
+                    <div class="modal-dialog modal-lg">
+
+                        <div class="modal-content">
+
+                            <form
+                                method="POST"
+                                action="/subscriptions/{{ sub.id }}/edit"
+                            >
+
+                                <div class="modal-header">
+
+                                    <h5 class="modal-title">
+                                        Edit Subscription
+                                    </h5>
+
+                                    <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                    ></button>
+
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Subscription Name
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            class="form-control"
+                                            value="{{ sub.name }}"
+                                            required
+                                        >
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Remark Name
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="remark_name"
+                                            class="form-control"
+                                            value="{{ sub.remark_name or '' }}"
+                                        >
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Message Limit
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            name="message_limit"
+                                            class="form-control"
+                                            min="1"
+                                            max="5000"
+                                            value="{{ sub.message_limit }}"
+                                            required
+                                        >
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Encoding
+                                        </label>
+
+                                        <select
+                                            name="base64_enabled"
+                                            class="form-select"
+                                        >
+
+                                            <option
+                                                value="1"
+                                                {% if sub.base64_enabled %}
+                                                selected
+                                                {% endif %}
+                                            >
+                                                Base64
+                                            </option>
+
+                                            <option
+                                                value="0"
+                                                {% if not sub.base64_enabled %}
+                                                selected
+                                                {% endif %}
+                                            >
+                                                Plain Text
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Channels
+                                        </label>
+
+                                        <select
+                                            name="channel_ids"
+                                            class="form-select"
+                                            multiple
+                                            size="8"
+                                            required
+                                        >
+
+                                            {% for channel in channels %}
+
+                                            <option
+                                                value="{{ channel.id }}"
+                                                {% if channel in sub.channels %}
+                                                selected
+                                                {% endif %}
+                                            >
+                                                {{ channel.name }}
+                                            </option>
+
+                                            {% endfor %}
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary"
+                                    >
+                                        Save Changes
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
 
                     </div>
 
-                </td>
+                </div>
 
-            </tr>
+                {% endfor %}
 
-            {% endfor %}
+                </tbody>
 
-            </tbody>
+            </table>
 
-        </table>
+        </div>
+
+        {% else %}
+
+        <div class="p-4 text-muted">
+            No subscriptions created.
+        </div>
+
+        {% endif %}
 
     </div>
-
-    {% else %}
-
-    <div class="p-4 text-muted">
-        No subscriptions created.
-    </div>
-
-    {% endif %}
-
-</div>
-
 
 </div>
 

@@ -115,7 +115,7 @@ def create_app() -> Flask:
                 flash("Channel already exists.", "warning")
                 return redirect(url_for("channels"))
 
-            db.add(Channel(name=name, message_limit=parse_message_limit(request.form.get("message_limit"))))
+            db.add(Channel(name=name))
             db.commit()
 
         flash("Channel added.", "success")
@@ -141,7 +141,10 @@ def create_app() -> Flask:
             channel.enabled = enabled
             db.commit()
 
-        flash("Channel enabled." if enabled else "Channel disabled.", "success" if enabled else "warning")
+        flash(
+            "Channel enabled." if enabled else "Channel disabled.",
+            "success" if enabled else "warning",
+        )
         return redirect(url_for("channels"))
 
     @flask_app.route("/channels/<int:channel_id>/delete", methods=["POST"])
@@ -163,9 +166,16 @@ def create_app() -> Flask:
     @login_required
     def subscriptions():
         with db_session() as db:
-            enabled_channels = db.query(Channel).filter(Channel.enabled.is_(True)).order_by(Channel.name).all()
+            enabled_channels = (
+                db.query(Channel).filter(Channel.enabled.is_(True)).order_by(Channel.name).all()
+            )
             subscriptions = db.query(Subscription).order_by(Subscription.id.desc()).all()
-            return render_template("subscriptions.html", channels=enabled_channels, subscriptions=subscriptions)
+
+            return render_template(
+                "subscriptions.html",
+                channels=enabled_channels,
+                subscriptions=subscriptions,
+            )
 
     @flask_app.route("/subscriptions/create", methods=["POST"])
     @login_required
@@ -186,12 +196,64 @@ def create_app() -> Flask:
                 channel_ids=channel_ids,
                 remark_name=request.form.get("remark_name", "").strip(),
                 base64_enabled=request.form.get("base64_enabled") == "1",
+                message_limit=parse_message_limit(request.form.get("message_limit")),
             )
         except Exception as exc:
             log_service.exception(exc)
             flash(str(exc), "danger")
         else:
             flash("Subscription created.", "success")
+
+        return redirect(url_for("subscriptions"))
+
+    @flask_app.route(
+        "/subscriptions/<int:sub_id>/edit",
+        methods=["POST"],
+    )
+    @login_required
+    def edit_subscription(sub_id):
+
+        name = request.form.get("name", "").strip()
+
+        channel_ids = request.form.getlist("channel_ids")
+
+        if not name:
+            flash("Name required.", "danger")
+            return redirect(url_for("subscriptions"))
+
+        if not channel_ids:
+            flash(
+                "Select at least one channel.",
+                "danger",
+            )
+            return redirect(url_for("subscriptions"))
+
+        try:
+
+            subscription_service.update_subscription(
+                subscription_id=sub_id,
+                name=name,
+                channel_ids=channel_ids,
+                remark_name=request.form.get(
+                    "remark_name",
+                    "",
+                ).strip(),
+                base64_enabled=request.form.get("base64_enabled") == "1",
+                message_limit=parse_message_limit(request.form.get("message_limit")),
+            )
+
+        except Exception as exc:
+
+            log_service.exception(exc)
+
+            flash(str(exc), "danger")
+
+        else:
+
+            flash(
+                "Subscription updated.",
+                "success",
+            )
 
         return redirect(url_for("subscriptions"))
 

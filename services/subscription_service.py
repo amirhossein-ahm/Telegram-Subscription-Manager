@@ -1,21 +1,26 @@
-import secrets
 import base64
+import secrets
 
 from models import Channel, Subscription, db_session
 
-from services.telegram_service import telegram_service
-
 from services.extractor_service import extractor_service
+from services.telegram_service import telegram_service
 
 
 class SubscriptionService:
 
     @staticmethod
     def generate_token():
-
         return secrets.token_urlsafe(32)
 
-    def create_subscription(self, name, channel_ids, remark_name="", base64_enabled=True):
+    def create_subscription(
+        self,
+        name,
+        channel_ids,
+        remark_name="",
+        base64_enabled=True,
+        message_limit=300,
+    ):
 
         try:
             channel_ids = [int(channel_id) for channel_id in channel_ids]
@@ -28,11 +33,13 @@ class SubscriptionService:
         channel_ids = sorted(set(channel_ids))
 
         with db_session() as db:
+
             subscription = Subscription(
                 name=name,
                 remark_name=remark_name or None,
                 token=self.generate_token(),
                 base64_enabled=base64_enabled,
+                message_limit=message_limit,
             )
 
             channels = db.query(Channel).filter(Channel.id.in_(channel_ids)).all()
@@ -48,9 +55,54 @@ class SubscriptionService:
 
             return subscription.id
 
+    def update_subscription(
+        self,
+        subscription_id,
+        name,
+        channel_ids,
+        remark_name="",
+        base64_enabled=True,
+        message_limit=300,
+    ):
+
+        try:
+            channel_ids = [int(channel_id) for channel_id in channel_ids]
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Invalid channel selection") from exc
+
+        if not channel_ids:
+            raise ValueError("Select at least one channel")
+
+        channel_ids = sorted(set(channel_ids))
+
+        with db_session() as db:
+
+            subscription = db.query(Subscription).filter(Subscription.id == subscription_id).first()
+
+            if not subscription:
+                raise ValueError("Subscription not found")
+
+            channels = db.query(Channel).filter(Channel.id.in_(channel_ids)).all()
+
+            if len(channels) != len(channel_ids):
+                raise ValueError("One or more selected channels do not exist")
+
+            subscription.name = name
+            subscription.remark_name = remark_name or None
+            subscription.base64_enabled = base64_enabled
+            subscription.message_limit = message_limit
+
+            subscription.channels.clear()
+            subscription.channels.extend(channels)
+
+            db.commit()
+
+            return True
+
     def delete_subscription(self, subscription_id):
 
         with db_session() as db:
+
             sub = db.query(Subscription).filter(Subscription.id == subscription_id).first()
 
             if not sub:
@@ -75,6 +127,7 @@ class SubscriptionService:
     def get_feed_settings(self, token):
 
         with db_session() as db:
+
             subscription = db.query(Subscription).filter(Subscription.token == token).first()
 
             if not subscription:
@@ -93,24 +146,26 @@ class SubscriptionService:
     async def build_subscription(self, subscription_id):
 
         with db_session() as db:
+
             subscription = db.query(Subscription).filter(Subscription.id == subscription_id).first()
 
             if not subscription:
-
                 raise ValueError("Subscription not found")
 
             remark_name = subscription.remark_name
 
-            channels = [
-                (channel.name, channel.message_limit)
-                for channel in subscription.channels
-                if channel.enabled
-            ]
+            message_limit = subscription.message_limit
+
+            channels = [channel.name for channel in subscription.channels if channel.enabled]
 
         configs = []
 
-        for channel_name, message_limit in channels:
-            messages = await telegram_service.get_messages(channel_name, message_limit)
+        for channel_name in channels:
+
+            messages = await telegram_service.get_messages(
+                channel_name,
+                message_limit,
+            )
 
             extracted = extractor_service.extract_from_messages(messages)
 
@@ -119,7 +174,14 @@ class SubscriptionService:
         configs = extractor_service.deduplicate(configs)
 
         if remark_name:
-            configs = [extractor_service.rewrite_remark(cfg, remark_name) for cfg in configs]
+
+            configs = [
+                extractor_service.rewrite_remark(
+                    cfg,
+                    remark_name,
+                )
+                for cfg in configs
+            ]
 
         return configs
 
@@ -135,7 +197,11 @@ class SubscriptionService:
 
         return base64.b64encode(content.encode("utf-8")).decode("utf-8")
 
-    async def build_feed(self, subscription_id, base64_enabled):
+    async def build_feed(
+        self,
+        subscription_id,
+        base64_enabled,
+    ):
 
         if base64_enabled:
             return await self.build_base64(subscription_id)
